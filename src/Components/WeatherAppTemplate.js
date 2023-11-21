@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import NavBar from "./NavBar";
 import SearchBar from "./SearchBar";
 import Forcust from "./Forcust";
@@ -9,6 +9,7 @@ function WeatherAppTemplate(props) {
     const [location,setLocation] = useState("27°10'36'' N & 78°0'29'' E");
     const [forcust_data,setForcust_data] = useState("");
     const [state,setState] = useState("England");
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
 
     const api_key = process.env.REACT_APP_API_KEY;
@@ -37,6 +38,17 @@ function WeatherAppTemplate(props) {
         }
     }
 
+    useEffect(() => {
+        // Update isMobile state when window is resized
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
 
     let performSearch=async ()=>{
         let lat = 0;
@@ -48,6 +60,7 @@ function WeatherAppTemplate(props) {
         let geo_data = await axios.get(geo_api__, {mode: 'no-cors'});
         lat = geo_data.data[0].lat;
         long = geo_data.data[0].lon;
+        setLocation(`${lat}° N & ${long}° E`);
         setState(geo_data.data[0].state);
         const forcust_api__ = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${long}&appid=${api_key}`;
         setForcust_data( await axios.get(forcust_api__, {mode: 'no-cors'}));
@@ -61,7 +74,11 @@ function WeatherAppTemplate(props) {
         <div>
             <NavBar setStartDate={setStartDate} setState={setState} setCity={setCity} setLocation={setLocation}/>
             <SearchBar location={location} state={state} setLocation={setLocation} city={city} setCity={setCity} performSearch={performSearch} />
+            {/*<div className={`bg-cyan-400 ${isMobile ? 'overflow-y-scroll scroll whitespace-nowra scroll-smooth max-h-screen' : ''}`}>*/}
+            <div className="scroll-smooth overflow-y-scroll">
+
             <Forcust startDate={startDate} city={city} setStartDate={setStartDate} forcust_data={forcust_data}/>
+            </div>
         </div>
     );
 }

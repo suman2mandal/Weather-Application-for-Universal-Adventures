@@ -8,7 +8,7 @@ function SearchBar({location,state,setLocation,city,setCity,performSearch}) {
                     <div>
                         <div className="flex items-center">
                             <img src={location_icon} height={50} width={50} alt="location_icon"/>
-                            <div className="text-4xl font-bold">
+                            <div className="text-xl sm:text-2xl md:text-4xl font-bold">
                                 {city},{state}
                             </div>
                         </div>

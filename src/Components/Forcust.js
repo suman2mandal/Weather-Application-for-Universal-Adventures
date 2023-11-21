@@ -39,7 +39,9 @@ function Forcust({startDate,city,setStartDate,forcust_data}) {
     }
 
     let endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + 4);
+    if(startDate!=="") {
+        endDate.setDate(startDate.getDate() + 4);
+    }
     function extractDateFromDateObject(dateObject) {
         // Extracting date components
         const year = dateObject.getFullYear();
@@ -195,7 +197,7 @@ function Forcust({startDate,city,setStartDate,forcust_data}) {
     return (
         <>
             <div className="mx-20 mt-16">
-                <div className="grid grid-cols-6 justify-items-center">
+                <div className={`grid min-h-min grid-cols-6 justify-items-center ${window.innerWidth >= 768 ? 'overflow-y-auto max-h-screen' : ''}`}>
                     {repeatedForecasts}
                 </div>
             </div>
