@@ -22,7 +22,8 @@ function WeatherApp(props) {
     const [wind,setWind] = useState(13);
     const [forcust,setForcust] = useState();
 
-    const api_key = process.env.REACT_APP_API_KEY;
+    // const api_key = process.env.REACT_APP_API_KEY;
+    const api_key = "db134c285a521ce3c2d5348c99516f70";
 
     const headers = {
         'Content-Type': 'application/json',
