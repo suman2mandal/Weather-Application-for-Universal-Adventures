@@ -104,12 +104,10 @@ function WeatherApp(props) {
 
                    <div className=' text-3xl flex items-center justify-center rounded-full w-1/5 bg-white hover:bg-gray-200' onClick={performSearch}>
                         <BsSearchHeart />
-
                     </div>
                </div>
                 <div className=" w-full flex justify-center items-center text-white">
                     <img src={placeIcon(ico_id,"@2x")}/>
-
                 </div>
                 <div className="flex w-full h-3/6 justify-center">
                     <div className=" w-5/6 h-full rounded-xl bg-opacity-60">
@@ -151,9 +149,7 @@ function WeatherApp(props) {
                             </div>
 
                             <div className="flex flex-wrap">
-
                                 {showForcast()}
-
                             </div>
                         </div>
                     </div>

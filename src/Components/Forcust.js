@@ -1,23 +1,22 @@
 import React, {useEffect, useState} from 'react';
 import weather_ico from './Assets/clear.png';
 import DatePicker from "react-datepicker";
-
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 import SearchBar from "./SearchBar";
 
 function Forcust({startDate,city,setStartDate,forcust_data}) {
-    const [icon,setIcon] = useState("Clear");
-    const [weather,setWeather] = useState("Cloudy");
-    const [Htemperature,setHtemperature] = useState(20);
-    const [Ltemperature,setLtemperature] = useState(20);
-    const [humidity,setHumidity] = useState(20);
-    const [SunriseTime,setSunriseTime] = useState("2:00");
-    const [SunsetTime,setSunsetTime] = useState("3:00");
-    const [date,setDate] = useState("20 Jan 2023");
+    const [dates, setDates] = useState([]);
+    const [icons, setIcons] = useState([]);
+    const [weathers, setWeathers] = useState([]);
+    const [Htemperatures, setHtemperatures] = useState([]);
+    const [Ltemperatures, setLtemperatures] = useState([]);
+    const [humidities, setHumidities] = useState([]);
+    const [SunriseTimes, setSunriseTimes] = useState([]);
+    const [SunsetTimes, setSunsetTimes] = useState([]);
 
     function convertUnixTimestampToTime(unixTimestamp) {
-        const date = new Date(unixTimestamp * 1000); // Convert to milliseconds
+        const date = new Date(unixTimestamp * 1000);
         const hours = date.getHours().toString().padStart(2, '0');
         const minutes = date.getMinutes().toString().padStart(2, '0');
         const formattedTime = `${hours}:${minutes}`;
@@ -39,95 +38,91 @@ function Forcust({startDate,city,setStartDate,forcust_data}) {
         return `${day} ${month} ${year}`;
     }
 
+    let endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 4);
+    function extractDateFromDateObject(dateObject) {
+        // Extracting date components
+        const year = dateObject.getFullYear();
+        const month = (dateObject.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+        const day = dateObject.getDate().toString().padStart(2, '0');
+
+        // Creating the formatted date string
+        const formattedDate = `${year}-${month}-${day}`;
+        return formattedDate;
+    }
+
+
     useEffect(() => {
-        setSunriseTime(convertUnixTimestampToTime(forcust_data?.data?.city?.sunrise) );
-        setSunsetTime(convertUnixTimestampToTime(forcust_data?.data?.city?.sunset) );
-        forcust_data?.data?.list?.map((item, range) => {
-            if (range <= 0) {
-                setDate(item.dt_txt);
-                setIcon(item.weather[0].icon);
-                setWeather(item.weather[0].main);
-                setHtemperature(item.main.temp_max);
-                setLtemperature(item.main.temp_min);
-                setHumidity(item.main.humidity);
-                // setSunriseTime(item.city.SunriseTime);
-                // setSunsetTime(item.ciry.SunsetTime);
+        const filteredData = [];
+
+        forcust_data?.data?.list?.forEach((item) => {
+            const dateObject = new Date(item.dt_txt);
+            const current_date = extractDateFromDateObject(dateObject);
+            const existingEntry = filteredData.find((entry) => entry.date === current_date);
+
+            if (!existingEntry) {
+                filteredData.push({
+                    date: current_date,
+                    data: item,
+                });
+            } else {
+                if (item.priority > existingEntry.data.priority) {
+                    existingEntry.data = item;
+                }
             }
+        });
+
+        console.log(filteredData);
+        const newDates = [];
+        const newIcons = [];
+        const newWeathers = [];
+        const newHtemperatures = [];
+        const newLtemperatures = [];
+        const newHumidities = [];
+        const newSunriseTimes = [];
+        const newSunsetTimes = [];
+
+        filteredData?.forEach((item, range) => {
+            newDates.push(item.data.dt_txt);
+            newIcons.push(item.data.weather[0].icon);
+            newWeathers.push(item.data.weather[0].main);
+            newHtemperatures.push(item.data.main.temp_max);
+            newLtemperatures.push(item.data.main.temp_min);
+            newHumidities.push(item.data.main.humidity);
+            newSunriseTimes.push(convertUnixTimestampToTime(forcust_data?.data?.city?.sunrise));
+            newSunsetTimes.push(convertUnixTimestampToTime(forcust_data?.data?.city?.sunset));
+
+            setDates(newDates);
+            setIcons(newIcons);
+            setWeathers(newWeathers);
+            setHtemperatures(newHtemperatures);
+            setLtemperatures(newLtemperatures);
+            setHumidities(newHumidities);
+            setSunriseTimes(newSunriseTimes);
+            setSunsetTimes(newSunsetTimes);
+
         });
     }, [city, forcust_data]);
 
     const placeIcon=(ico_id,size="")=>{
         const icon_api = `https://openweathermap.org/img/wn/${ico_id}${size}.png`;
         return icon_api
-        // console.log(ico_id)
     }
-    // const [date, setDate] = useState(new Date());
 
-    const forecastData = [
-        {
-            date: "20 Jan 2023",
-            weather: "Sunny",
-            Htemperature: "27°C / 63°F",
-            Ltemperature: "27°C / 63°F",
-            Humidity: "50%",
-            SunriseTime: "6:00",
-            SunsetTime: "8:00",
-        },
-        {
-            "date": "21 Jan 2023",
-            "weather": "Partly Cloudy",
-            "Htemperature": "25°C / 77°F",
-            "Ltemperature": "18°C / 64°F",
-            Humidity: "50%",
-            "SunriseTime": "6:15",
-            "SunsetTime": "7:45"
-        },
-        {
-            "date": "22 Jan 2023",
-            "weather": "Rainy",
-            "Htemperature": "20°C / 68°F",
-            "Ltemperature": "15°C / 59°F",
-            Humidity: "50%",
-            "SunriseTime": "6:30",
-            "SunsetTime": "7:30"
-        },
-        {
-            "date": "23 Jan 2023",
-            "weather": "Cloudy",
-            "Htemperature": "22°C / 72°F",
-            "Ltemperature": "17°C / 63°F",
-            Humidity: "50%",
-            "SunriseTime": "6:10",
-            "SunsetTime": "7:55"
-        },
-        {
-            "date": "24 Jan 2023",
-            "weather": "Clear Sky",
-            "Htemperature": "30°C / 86°F",
-            "Ltemperature": "22°C / 72°F",
-            Humidity: "50%",
-            "SunriseTime": "5:45",
-            "SunsetTime": "8:15"
-        },
-        {
-            "date": "25 Jan 2023",
-            "weather": "Thunderstorm",
-            "Htemperature": "18°C / 64°F",
-            "Ltemperature": "14°C / 57°F",
-            Humidity: "50%",
-            "SunriseTime": "6:20",
-            "SunsetTime": "7:40"
-        }
-    ];
+    function celsiusToFahrenheit(celsius) {
+        return (celsius * 9/5) + 32;
+    }
+    function removeDecimalPart(number) {
+        return Math.floor(number);
+    }
+
 
     const repeatedForecasts = Array.from({ length: 6 }, (_, index) => (
             index===0?(
                 <div className="grid grid-row-2 ">
                     <div className="text-sm sm:text-xl font-bold h-auto">  </div>
                     <div className="grid grid-row-6 items-center">
-
                         <div className="flex items-center">
-
                             <div className="relative max-w-sm">
                                 <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                                     <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
@@ -137,8 +132,6 @@ function Forcust({startDate,city,setStartDate,forcust_data}) {
                                 <DatePicker selected={startDate} onChange={(date) => setStartDate(date)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date"/>
                                 {/*<input type="date" datepicker datepicker-autohide type="text" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date"/>*/}
                             </div>
-
-
                         </div>
                         <div className="text-xl font-bold">
                             Htemperature
@@ -159,39 +152,39 @@ function Forcust({startDate,city,setStartDate,forcust_data}) {
                 </div>
             ):(
                 <div className="grid grid-row-2 w-full px-2">
-                    <div className="text-sm text-center sm:text-xl font-bold h-auto">{convertDateStringToFormattedDate(date)}</div>
+                    <div className="text-sm text-center sm:text-xl font-bold text-2xl h-auto">{convertDateStringToFormattedDate(dates[index-1])}</div>
                     <div className="grid w-full text-white rounded-xl grid-row-6 bg-gradient-to-b from-[#464646] to-[#1D2540]">
 
-                        <div className="flex justify-center items-center">
+                        <div className="flex flex-col xl:flex-row justify-center mt-2 mb-2 items-center">
                             {/*<img src={weather_ico} height={100} width={100} alt="weather_ico"/>*/}
-                            <img src={placeIcon(icon,"@2x")}/>
+                            <img className="shadow-gray-500 shadow-md rounded-full" src={placeIcon(icons[index-1],"@2x")}/>
                             <div className="text-3xl font-bold">
                                 {/*{forecastData[index].weather}*/}
-                                {weather}
+                                {weathers[index-1]}
                             </div>
 
                         </div>
 
                         <div className="text-xl text-center  font-bold">
                             <hr className="border-1 opacity-10 border-white w-full mb-4"/>
-                            {/*{forecastData[index].Htemperature}*/}
-                            {Htemperature}° F/{Htemperature}° C
+                            {/*{Htemperature}*/}
+                            {removeDecimalPart(celsiusToFahrenheit(Htemperatures[index-1]-273.15))}° F/{removeDecimalPart(Htemperatures[index-1]-273.15)}° C
                         </div>
                         <div className="text-xl text-center  font-bold mt-2">
-                            {/*{forecastData[index].Ltemperature}*/}
-                            {Ltemperature}° F/{Ltemperature}° C
+                            {/*{Ltemperature}*/}
+                            {removeDecimalPart(celsiusToFahrenheit(Ltemperatures[index-1]-273.15))}° F/{removeDecimalPart(Ltemperatures[index-1]-273.15)}° C
                         </div>
                         <div className="text-xl text-center  font-bold mt-2">
                             {/*{forecastData[index].Humidity}*/}
-                            {humidity} %
+                            {humidities[index-1]} %
                         </div>
                         <div className="text-xl text-center font-bold mt-2">
                             {/*{forecastData[index].SunriseTime} AM*/}
-                            {SunriseTime} AM
+                            {SunriseTimes[index-1]} AM
                         </div>
                         <div className="text-xl text-center mb-4 font-bold mt-2">
                             {/*{forecastData[index].SunsetTime} PM*/}
-                            {SunsetTime} PM
+                            {SunsetTimes[index-1]} PM
                         </div>
                     </div>
                 </div>
@@ -201,12 +194,11 @@ function Forcust({startDate,city,setStartDate,forcust_data}) {
 
     return (
         <>
-        <div className="mx-20 mt-16">
-
-            <div className="grid grid-cols-6 justify-items-center">
-                {repeatedForecasts}
+            <div className="mx-20 mt-16">
+                <div className="grid grid-cols-6 justify-items-center">
+                    {repeatedForecasts}
+                </div>
             </div>
-        </div>
         </>
     );
 }

@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import NavBar from "./NavBar";
 import SearchBar from "./SearchBar";
 import Forcust from "./Forcust";
-import SideObject from "./SideObject";
 import axios from "axios";
 function WeatherAppTemplate(props) {
     const [startDate, setStartDate] = useState(new Date());
@@ -52,7 +51,6 @@ function WeatherAppTemplate(props) {
         setState(geo_data.data[0].state);
         const forcust_api__ = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${long}&appid=${api_key}`;
         setForcust_data( await axios.get(forcust_api__, {mode: 'no-cors'}));
-
         // console.log(current_data);
         // console.log(geo_data);
     }
