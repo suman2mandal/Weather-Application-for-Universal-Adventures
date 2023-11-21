@@ -12,7 +12,7 @@ function WeatherAppTemplate(props) {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
 
-    const api_key = process.env.REACT_APP_API_KEY;
+    const api_key = "db134c285a521ce3c2d5348c99516f70";
     console.log(startDate);
     const headers = {
         'Content-Type': 'application/json',
